@@ -70,7 +70,7 @@ void loop() {
       serializeJson(doc, jsonPayload);
       httpClient.begin(wifiClient, ServerUrl);
       httpClient.addHeader("Content-Type", "application/json");
-      int httpResponseCode = httpClient.PATCH(jsonPayload);
+      int httpResponseCode = httpClient.POST(jsonPayload);
 
       if (httpResponseCode > 0) {
         String responsePayload = httpClient.getString();
@@ -78,7 +78,7 @@ void loop() {
         Serial.println("Returned payload:");
         Serial.println(responsePayload);
       } else {
-        Serial.printf("Error on sending PATCH: %d\n", httpResponseCode);
+        Serial.printf("Error on sending POST: %d\n", httpResponseCode);
       }
 
       httpClient.end();
