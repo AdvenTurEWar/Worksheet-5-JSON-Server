@@ -12,13 +12,11 @@ const char* ServerUrl = "http://192.168.137.1:3000/senserc";
 
 DHT dhtSensor(D4, DHT11);
 
-// NTP setup
-const long TimeOffset = 25200; // 7 hours for Thailand
-const int NTPInterval = 60000; // Update interval in milliseconds
+const long TimeOffset = 25200;
+const int NTPInterval = 60000;
 WiFiUDP ntpUDP;
 NTPClient ntpClient(ntpUDP, "pool.ntp.org", TimeOffset, NTPInterval);
 
-// HTTP client
 WiFiClient wifiClient;
 HTTPClient httpClient;
 
@@ -49,23 +47,19 @@ void loop() {
     if (isnan(humidity) || isnan(temperature)) {
       Serial.println("Failed to read from DHT sensor");
     } else {
-      // Log readings to the serial
       Serial.printf("Humidity: %.2f%%\n", humidity);
       Serial.printf("Temperature: %.2f°C\n", temperature);
 
-      // Get current time formatted as a string
       time_t currentTime = ntpClient.getEpochTime();
       struct tm* timeInfo = gmtime(&currentTime);
       char timeString[25];
       strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", timeInfo);
 
-      // Prepare JSON document
       StaticJsonDocument<300> doc;
       JsonObject dataObject = doc.createNestedObject(timeString);
       dataObject["humidity"] = humidity;
       dataObject["temperature"] = temperature;
 
-      // Serialize and send the JSON document
       String jsonPayload;
       serializeJson(doc, jsonPayload);
       httpClient.begin(wifiClient, ServerUrl);
